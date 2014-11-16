@@ -7,6 +7,6 @@ class ApplicationController < ActionController::Base
   private
 
   def authenticate_user!
-    @current_user = Token.authenticate(headers['Authorization'])
+    @current_user = Token.authenticate(request.headers['Authorization'])
   end
 end

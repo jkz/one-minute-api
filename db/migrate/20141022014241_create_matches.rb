@@ -2,10 +2,10 @@ class CreateMatches < ActiveRecord::Migration
   def change
     create_table :matches do |t|
 
-      t.string :user_1_id
+      t.integer :user_1_id
       t.boolean :user_1_like
 
-      t.string :user_2_id
+      t.integer :user_2_id
       t.boolean :user_2_like
 
       t.timestamps

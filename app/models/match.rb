@@ -1,16 +1,41 @@
+require 'upsert/active_record_upsert'
+
 class Match < ActiveRecord::Base
   validates :user_1_id, presence: true
   validates :user_2_id, presence: true
 
-  has_one :user_1, class: User
-  has_one :user_2, class: User
+  validate :not_self_swipe
+  validate :user_id_order
 
-  scope :matches { where(user_1_like: true, user_2_like: true) }
+  belongs_to :user_1, class: User
+  belongs_to :user_2, class: User
+
+  scope :mutual, -> { where(user_1_like: true, user_2_like: true) }
+
+  def mutual
+    user_1_like and user_2_like
+  end
+
+  def other_than(user)
+    if user == self.user_1
+      self.user_2
+    elsif user == self.user_2
+      self.user_1
+    else
+      nil
+    end
+  end
+
+  def self.of_user(user)
+    where("? in (matches.user_1_id, matches.user_2_id)", user.id)
+  end
 
   def self.swipe(subject, object, verdict)
+    subject = subject.send(:id) || subject
+    object = object.send(:id) || object
     users = {
-      user_1_id: [subject, object].max
-      user_2_id: [subject, object].min
+      user_1_id: [subject, object].min,
+      user_2_id: [subject, object].max
     }
 
     if subject == users[:user_1_id]
@@ -19,6 +44,24 @@ class Match < ActiveRecord::Base
       swiper = :user_2_like
     end
 
-    upsert users, {swiper => verdict}
+    # TODO this somehow taking verdict as match identifier
+    # upsert users, {swiper => verdict}
+
+    match = Match.where(users).first_or_create
+    match.update({swiper => verdict})
+  end
+
+  private
+
+  def not_self_swipe
+    return unless user_1 == user_2
+    errors.add(:user_id_1, "Can't swipe self")
+    errors.add(:user_id_2, "Can't swipe self")
+  end
+
+  def user_id_order
+    return if user_1_id < user_2_id
+    errors.add(:user_id_1, "Ids need to be ordered")
+    errors.add(:user_id_2, "Ids need to be ordered")
   end
 end

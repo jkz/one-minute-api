@@ -1,7 +1,9 @@
 require 'test_helper'
 
 class MatchesControllerTest < ActionController::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test "index" do
+  end
+
+  test "update" do
+  end
 end

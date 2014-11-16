@@ -2,10 +2,10 @@ class MatchesController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @matches = current_user.matches.all
+    @matches = current_user.matches.mutual
   end
 
-  def swipe
+  def update
     current_user.match(swipe_params)
     head :no_content
   end
@@ -13,6 +13,6 @@ class MatchesController < ApplicationController
   private
 
   def swipe_params
-    params.require(:id, :verdict)
+    params.permit(:id, :like)
   end
 end

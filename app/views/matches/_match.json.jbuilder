@@ -1,0 +1,1 @@
+json.extract! match.other_than(current_user), :id
