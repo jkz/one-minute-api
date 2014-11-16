@@ -40,7 +40,7 @@ class MatchTest < ActiveSupport::TestCase
     user_2 = User.create
 
     Match.swipe(user_1, user_2, true)
-    match = Match.find_by({user_1_id: 5, user_2_id: 6})
+    match.find_by(Match.user_params(user_1, user_2))
 
     assert match
     assert_not match.mutual

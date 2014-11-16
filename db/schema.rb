@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20141115152419) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "matches", force: true do |t|
     t.integer  "user_1_id"
     t.boolean  "user_1_like"
@@ -22,7 +25,7 @@ ActiveRecord::Schema.define(version: 20141115152419) do
     t.datetime "updated_at"
   end
 
-  add_index "matches", ["user_1_id", "user_2_id"], name: "index_matches_on_user_1_id_and_user_2_id"
+  add_index "matches", ["user_1_id", "user_2_id"], name: "index_matches_on_user_1_id_and_user_2_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "authentication_token"
@@ -32,6 +35,6 @@ ActiveRecord::Schema.define(version: 20141115152419) do
     t.string   "public_id"
   end
 
-  add_index "users", ["public_id"], name: "index_users_on_public_id", unique: true
+  add_index "users", ["public_id"], name: "index_users_on_public_id", unique: true, using: :btree
 
 end
