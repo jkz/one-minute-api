@@ -36,8 +36,8 @@ class MatchTest < ActiveSupport::TestCase
   end
 
   test "swipe" do
-    user_1 = user.find(5)
-    user_2 = user.find(6)
+    user_1 = User.create
+    user_2 = User.create
 
     Match.swipe(user_1, user_2, true)
     match = Match.find_by({user_1_id: 5, user_2_id: 6})

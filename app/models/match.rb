@@ -26,28 +26,30 @@ class Match < ActiveRecord::Base
     end
   end
 
+  def self.users_params(user_1, user_2)
+    ids = [user_1.send(:id) || user_1, user_2.send(:id) || user_2].sort
+
+    {
+      user_1_id: ids[0],
+      user_2_id: ids[1]
+    }
+  end
+
   def self.of_user(user)
     where("? in (matches.user_1_id, matches.user_2_id)", user.id)
   end
 
   def self.swipe(subject, object, verdict)
-    subject = subject.send(:id) || subject
-    object = object.send(:id) || object
-    users = {
-      user_1_id: [subject, object].min,
-      user_2_id: [subject, object].max
-    }
+    match = Match.where(users_params(subject, object)).first_or_create
 
-    if subject == users[:user_1_id]
+    if match.user_1 == subject
       swiper = :user_1_like
     else
       swiper = :user_2_like
     end
 
-    # TODO this somehow taking verdict as match identifier
+    # TODO upsert somehow includes verdict as match identifier
     # upsert users, {swiper => verdict}
-
-    match = Match.where(users).first_or_create
     match.update({swiper => verdict})
   end
 
