@@ -5,14 +5,14 @@ class MatchesController < ApplicationController
     @matches = current_user.matches.mutual
   end
 
-  def update
-    current_user.match(swipe_params)
+  def create
+    current_user.swipe(swipe_params[:user_id], swipe_params[:like])
     head :no_content
   end
 
   private
 
   def swipe_params
-    params.permit(:id, :like)
+    params.permit(:user_id, :like)
   end
 end

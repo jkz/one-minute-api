@@ -4,6 +4,8 @@ class TargetsController < ApplicationController
   # Return a list of potential matches
   # Filtered by search preferences and proximity
   def index
-    @targets = User.all
+    # puts 'targets', current_user, current_user.id, User.all
+    @targets = current_user.targets
+    # @targets = User.all
   end
 end

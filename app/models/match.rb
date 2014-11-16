@@ -27,7 +27,7 @@ class Match < ActiveRecord::Base
   end
 
   def self.users_params(user_1, user_2)
-    ids = [user_1.send(:id) || user_1, user_2.send(:id) || user_2].sort
+    ids = [user_1.try(:id) || user_1, user_2.try(:id) || user_2].sort
 
     {
       user_1_id: ids[0],

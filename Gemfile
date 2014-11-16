@@ -15,3 +15,4 @@ group :production do
 end
 
 gem 'upsert'
+gem 'httparty'

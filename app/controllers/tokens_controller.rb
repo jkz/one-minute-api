@@ -2,14 +2,26 @@ class TokensController < ApplicationController
   # Pass in a facebook token and return a user
   def create
     # TODO
-    # Get facebook user data
-    @user = User.first || User.create
-    facebook_user_data = {}
+    # Handle errors
+    facebook_user_data = HTTParty.get(
+      "https://graph.facebook.com/me",
+      query: {
+        access_token: params[:facebook_token]
+      }
+    )
+
+    puts "FB DATA", facebook_user_data
+
+    @status = :ok
+
+    @user = User.where(facebook_id: facebook_user_data['id']).first_or_create do
+      @status = :created
+    end
 
     # Update user information in database
-    @user.update! facebook_user_data
+    # @user.update! facebook_user_data
 
     # Return authentication token
-    render json: {token: @user.authentication_token}
+    render json: {token: @user.authentication_token}, status: @status
   end
 end
