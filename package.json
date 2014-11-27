@@ -1,0 +1,23 @@
+{
+  "name": "asdf",
+  "version": "0.0.0",
+  "description": "asdf",
+  "main": "player.js",
+  "devDependencies": {
+    "typescript": "^1.3.0"
+  },
+  "scripts": {
+    "compile": "tsc *.ts --out player.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jessethegame/one-minute-api.git"
+  },
+  "author": "Koen Mostert, Jesse Zwaan, Hraban Luyat",
+  "license": "all rights reserved",
+  "bugs": {
+    "url": "https://github.com/jessethegame/one-minute-api/issues"
+  },
+  "homepage": "https://github.com/jessethegame/one-minute-api"
+}
