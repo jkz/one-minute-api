@@ -1,0 +1,11 @@
+.ambient {
+    text-transform: italic;
+}
+
+.ambient::before {
+    content: "* ";
+}
+
+.profile {
+    color: blue;
+}

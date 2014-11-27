@@ -1,4 +1,8 @@
-module OneMinuteScriptPlayer {
+// Copyright © 2014 authors, see package.json
+//
+// all rights reserved
+
+module OneMinuteScript {
 
     export enum SexualPreference {
         Straight,
@@ -11,7 +15,7 @@ module OneMinuteScriptPlayer {
     }
 
     export interface Action {
-        (c: Context): void;
+        (): void;
     }
 
     export interface SceneInstance {
@@ -40,7 +44,7 @@ module OneMinuteScriptPlayer {
 
     // Combine multiple actions into one
     export function actions(fs: Action[]): Action {
-        return (c) => fs.forEach(f => f(c));
+        return () => fs.forEach(f => f());
     }
 
     export class Profile {

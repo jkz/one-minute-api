@@ -1,6 +1,10 @@
+// Copyright © 2014 authors, see package.json
+//
+// all rights reserved
+
 /// <reference path="types.ts"/>
 
-module OneMinuteScriptPlayer {
+module OneMinuteScript {
 
     var FirstNeighborProfile = new Profile("Hi! My name is Max and this is my 6 second profile! See you around.");
 
@@ -22,7 +26,7 @@ module OneMinuteScriptPlayer {
         return {
             pause: p.pause(),
             prev: p.goToScene(NewUserScene),
-            next: p.goToScene(ExploreNeighborhood1Scene),
+            next: p.goToScene(BusstopToLafayetteScene),
             content: [
                 p.ambient("Footsteps on the pavement. Background noise: people talking, light street activity. 30ft."),
                 p.voiceOver("This is the first house. Let's check out who lives here."),
