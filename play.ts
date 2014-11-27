@@ -7,4 +7,3 @@
 var max = new OneMinuteScript.HtmlTextPlayer(
         OneMinuteScript.NewUserScene,
         OneMinuteScript.SexualPreference.Straight);
-max.play();
