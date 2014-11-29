@@ -13,3 +13,9 @@
 .error {
     color: red;
 }
+
+.scene {
+    margin-left: 2em;
+    text-transform: uppercase;
+    font-family: monospace;
+}

@@ -10,6 +10,7 @@ module OneMinuteScript {
 
     export var NewUserScene: Scene = function (p: Player) {
         return {
+            name: "New User",
             pause: p.pause(),
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(ExploreNeighborhood1Scene),
@@ -24,6 +25,7 @@ module OneMinuteScript {
 
     export var ExploreNeighborhood1Scene: Scene = function (p: Player) {
         return {
+            name: "Explore Neighborhood",
             pause: p.pause(),
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(BusstopToLafayetteScene),
@@ -42,6 +44,7 @@ module OneMinuteScript {
 
     export var BusstopToLafayetteScene: Scene = function (p: Player) {
         return {
+            name: "Busstop",
             pause: p.goToScene(EnterBusToLafayetteScene),
             prev: p.goToScene(ExploreNeighborhood1Scene),
             next: p.goToScene(ExploreNeighborhood2Scene),
@@ -55,6 +58,7 @@ module OneMinuteScript {
 
     export var EnterBusToLafayetteScene: Scene = function (p: Player) {
         return {
+            name: "Bus to Lafayette",
             pause: p.pause(),
             prev: p.goToScene(BusstopToLafayetteScene),
             next: p.goToScene(ArrivedInLafayetteScene),
@@ -91,6 +95,7 @@ module OneMinuteScript {
 
     export var ArrivedInLafayetteScene: Scene = function (p: Player) {
         return {
+            name: "Lafayette",
             pause: p.pause(),
             prev: p.goToScene(InBusToLafayetteScene),
             next: p.goToScene(ExploreNeighborhood2Scene),
@@ -102,6 +107,7 @@ module OneMinuteScript {
 
     export var ExploreNeighborhood2Scene: Scene = function (p: Player) {
         return {
+            name: "Explore neighborhood further",
             pause: p.pause(),
             prev: p.goToScene(BusstopToLafayetteScene),
             next: p.goToScene(ExploreNeighborhood2Scene),

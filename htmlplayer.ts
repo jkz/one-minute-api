@@ -74,12 +74,14 @@ module OneMinuteScript {
 
         buttons: ControlButtons;
 
-        constructor(private p: HtmlTextPlayer, private scene: Scene) {
+        constructor(private p: HtmlTextPlayer, private scene: Scene, private container: HTMLElement) {
             var sceneDef = scene(p);
-//          if (undefined !== sceneDef.name) {
-//              this.addMessage('    SCENE: ' + name.toUpperCase(), 'scene');
-//          }
-            this.actions = sceneDef.content.slice(0);
+            if (undefined !== sceneDef.name) {
+                this.actions.push(function (sp: ScenePlayer) {
+                    sp.addMessage('SCENE: ' + sceneDef.name, 'scene');
+                });
+            }
+            this.actions.push.apply(this.actions, sceneDef.content);
             // Default last action
             this.actions.push(sceneDef.next);
             this.buttons = {
@@ -89,9 +91,9 @@ module OneMinuteScript {
             };
         }
 
-        addMessage(container: HTMLElement, text: string, cls: string) {
+        addMessage(text: string, cls: string) {
             this.stop();
-            this.action = new TeleTypeAction(container, text, cls);
+            this.action = new TeleTypeAction(this.container, text, cls);
             this.action.play();
             this.action.done.then(() => this.next());
         }
@@ -148,7 +150,7 @@ module OneMinuteScript {
                 }
             };
             document.body.appendChild(p.container);
-            this.sp = new ScenePlayer(this, scene);
+            this.sp = new ScenePlayer(this, scene, this.container);
         }
 
         private _goToScene(scene: Scene) {
@@ -160,7 +162,7 @@ module OneMinuteScript {
                 this.container.appendChild(p);
                 return;
             }
-            this.sp = new ScenePlayer(this, scene);
+            this.sp = new ScenePlayer(this, scene, this.container);
             this.sp.play();
         }
 
@@ -169,15 +171,15 @@ module OneMinuteScript {
         }
 
         voiceOver(text: string): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(this.container, text, 'voiceOver');
+            return c => (<ScenePlayer>c).addMessage(text, 'voiceOver');
         }
 
         ambient(desc: string): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(this.container, desc, 'ambient');
+            return c => (<ScenePlayer>c).addMessage(desc, 'ambient');
         }
 
         playProfile(profile: Profile): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(this.container, profile.msg, 'profile');
+            return c => (<ScenePlayer>c).addMessage(profile.msg, 'profile');
         }
 
         setSexualPreference(pref: SexualPreference): SceneAction {
