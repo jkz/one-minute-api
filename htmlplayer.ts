@@ -2,17 +2,131 @@
 //
 // all rights reserved
 
+/// <reference path="es6-promise.d.ts"/>
+
 /// <reference path="types.ts"/>
 /// <reference path="script.ts"/>
 
+interface Func<T> {
+    (): T;
+}
+
 module OneMinuteScript {
 
-    export class HtmlTextPlayer implements Player {
+    // Write a message to this element in "teletype style", where text appears
+    // character for character as if someone is typing it live. The callback is
+    // invoked when the entire message is written to the element. Returns the
+    // interval ID for this task.
+    class TeleTypeAction {
+        private interId: number;
+        private el = document.createElement('p');
+        private i = 0;
+        private resolve: Action;
+        done = new Promise<void>(r => this.resolve = r);
 
-        private s: SceneInstance;
+        constructor(container: HTMLElement, private msg: string, cls: string) {
+            this.el.classList.add(cls);
+            container.appendChild(this.el);
+        }
+
+        private setNewChar() {
+            if (this.i++ < this.msg.length) {
+                this.el.innerText = this.msg.slice(0, this.i);
+            } else {
+                clearInterval(this.interId);
+                this.resolve();
+            }
+        }
+
+        playPause() {
+            if (undefined == this.interId) {
+                this.play();
+            } else {
+                // stop == pause for this action
+                this.stop();
+            }
+        }
+
+        play() {
+            this.interId = setInterval(() => this.setNewChar(), 20);
+        }
+
+        // Does not resolve this.done
+        stop() {
+            if (undefined !== this.interId) {
+                clearInterval(this.interId);
+                this.interId = undefined;
+            }
+        }
+    }
+
+    interface ControlButtons {
+        playPause: Action;
+        prev: Action;
+        next: Action;
+    }
+
+    // Play one scene
+    class ScenePlayer {
+        private action: TeleTypeAction;
+        private goToNextScene: Func<Scene>;
+        private actions: SceneAction[] = [];
+
+        buttons: ControlButtons;
+
+        constructor(private p: HtmlTextPlayer, private scene: Scene) {
+            var sceneDef = scene(p);
+//          if (undefined !== sceneDef.name) {
+//              this.addMessage('    SCENE: ' + name.toUpperCase(), 'scene');
+//          }
+            this.actions = sceneDef.content.slice(0);
+            // Default last action
+            this.actions.push(sceneDef.next);
+            this.buttons = {
+                playPause: () => sceneDef.pause(this),
+                prev: () => sceneDef.prev(this),
+                next: () => sceneDef.next(this),
+            };
+        }
+
+        addMessage(container: HTMLElement, text: string, cls: string) {
+            this.stop();
+            this.action = new TeleTypeAction(container, text, cls);
+            this.action.play();
+            this.action.done.then(() => this.next());
+        }
+
+        playPause() {
+            if (this.action) {
+                this.action.playPause();
+            }
+        }
+
+        play() {
+            if (this.action) {
+                throw new Error("Already playing");
+            }
+            this.next();
+        }
+
+        stop() {
+            if (this.action) {
+                this.action.stop();
+                this.action = undefined;
+            }
+        }
+
+        next() {
+            this.stop();
+            this.actions.shift()(this);
+        }
+    }
+
+    export class HtmlTextPlayer implements Player {
+        private sp: ScenePlayer;
         private container: HTMLElement;
-        private actions: Action[];
-        private onPause: Action = () => {};
+        private static MAX_SCENES = 10;
+        private numScenes = 0;
 
         constructor(scene: Scene, private sexualPreference: SexualPreference) {
             document.body.innerHTML = '';
@@ -23,109 +137,74 @@ module OneMinuteScript {
                 switch (e.keyCode) {
                     case 38: // up
                     case 40: // down
-                        p.s.pause();
+                        p.sp.buttons.playPause();
                         break;
                     case 37: // left
-                        p.s.prev();
+                        p.sp.buttons.prev();
                         break;
                     case 39: // right
-                        p.s.next();
+                        p.sp.buttons.next();
                         break;
                 }
             };
             document.body.appendChild(p.container);
-            p.goToScene(scene)();
+            this.sp = new ScenePlayer(this, scene);
         }
 
-        // Write a message to this element in "teletype style", where text appears
-        // character for character as if someone is typing it live. The callback is
-        // invoked when the entire message is written to the element.
-        teleType(msg: string, el: HTMLElement, done?: Function) {
-            var i = 0;
-            var oldOnPause = this.onPause;
-            this.onPause = function () {
-                if (null == interId) {
-                    interId = setInterval(setNewChar, 20);
-                } else {
-                    clearInterval(interId);
-                    interId = null;
-                }
-            };
-            function setNewChar() {
-                if (i++ < msg.length) {
-                    el.innerText = msg.slice(0, i);
-                } else {
-                    clearInterval(interId);
-                    this.onPause = oldOnPause;
-                    if (done) {
-                        done();
-                    }
-                }
-            }
-            var interId = setInterval(setNewChar, 20);
-        }
-
-        goToScene(scene: Scene): Action {
-            var p = this;
-            return function () {
-                p.s = scene(p);
-                p.actions = p.s.content.slice(0);
-                // Default last action
-                p.actions.push(p.s.next);
-                p.next();
-            };
-        }
-
-        setSexualPreference(pref: SexualPreference): Action {
-            var p = this;
-            return function () {
-                p.sexualPreference = pref;
-                p.next();
-            }
-        }
-
-        pause(): Action {
-            // Don't pass onPause by ref to allow changing it at runtime
-            return () => this.onPause();
-        }
-
-        private addMessage(text: string, cls: string) {
-            var p = this;
-            var el = document.createElement('p');
-            el.classList.add(cls);
-            p.container.appendChild(el);
-            p.teleType(text, el, () => p.next());
-        }
-
-        voiceOver(text: string): Action {
-            return () => this.addMessage(text, 'voiceOver');
-        }
-
-        ambient(desc: string): Action {
-            return () => this.addMessage(desc, 'ambient');
-        }
-
-        playProfile(profile: Profile): Action {
-            return () => this.addMessage(profile.msg, 'profile');
-        }
-
-        getAndPlayProfile(): Action {
-            var p = this;
-            return function () {
-                var profile = new Profile("TODO: Implement get next profile");
-                p.playProfile(profile)();
-                p.next();
-            };
-        }
-
-        private static MAX_ACTIONS = 20;
-        private numActions = 0;
-        private next() {
-            if (++this.numActions > HtmlTextPlayer.MAX_ACTIONS) {
+        private _goToScene(scene: Scene) {
+            this.sp.stop();
+            if (++this.numScenes > HtmlTextPlayer.MAX_SCENES) {
+                var p = document.createElement('p');
+                p.classList.add('error');
+                p.innerText = 'STOP: Maximum number of scene transitions reached.';
+                this.container.appendChild(p);
                 return;
             }
-            var action = this.actions.shift();
-            action();
+            this.sp = new ScenePlayer(this, scene);
+            this.sp.play();
+        }
+
+        goToScene(scene: Scene): SceneAction {
+            return c => this._goToScene(scene);
+        }
+
+        voiceOver(text: string): SceneAction {
+            return c => (<ScenePlayer>c).addMessage(this.container, text, 'voiceOver');
+        }
+
+        ambient(desc: string): SceneAction {
+            return c => (<ScenePlayer>c).addMessage(this.container, desc, 'ambient');
+        }
+
+        playProfile(profile: Profile): SceneAction {
+            return c => (<ScenePlayer>c).addMessage(this.container, profile.msg, 'profile');
+        }
+
+        setSexualPreference(pref: SexualPreference): SceneAction {
+            var p = this;
+            return function (c: any) {
+                var sp: ScenePlayer = c;
+                p.sexualPreference = pref;
+                sp.next();
+            }
+        }
+
+        pause(): SceneAction {
+            return c => (<ScenePlayer>c).playPause();
+        }
+
+        private _getAndPlayProfile() {
+            var p = this;
+            var profile = new Profile("TODO: Implement get next profile");
+            p.playProfile(profile)(this.sp);
+        }
+
+        getAndPlayProfile(): SceneAction {
+            return c => this._getAndPlayProfile();
+        }
+
+        play() {
+            this.sp.play();
         }
 
     }

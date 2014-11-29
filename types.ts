@@ -18,33 +18,37 @@ module OneMinuteScript {
         (): void;
     }
 
-    export interface SceneInstance {
+    export interface SceneAction {
+        (context: any): void;
+    }
+
+    export interface SceneDefinition {
         name?: string;
-        content: Action[];
-        pause: Action;
-        prev: Action;
-        next: Action;
+        content: SceneAction[];
+        pause: SceneAction;
+        prev: SceneAction;
+        next: SceneAction;
     }
 
     export interface Scene {
-        (p: Player): SceneInstance;
+        (p: Player): SceneDefinition;
     }
 
     // Everything must be a method to allow capturing this in initialization etc
     // etc
     export interface Player {
-        goToScene(scene: Scene): Action;
-        setSexualPreference(pref: SexualPreference): Action;
-        pause(): Action;
-        voiceOver(text: string): Action;
-        ambient(desc: string): Action;
-        playProfile(profile: Profile): Action;
-        getAndPlayProfile(): Action;
+        goToScene(scene: Scene): SceneAction;
+        setSexualPreference(pref: SexualPreference): SceneAction;
+        pause(): SceneAction;
+        voiceOver(text: string): SceneAction;
+        ambient(desc: string): SceneAction;
+        playProfile(profile: Profile): SceneAction;
+        getAndPlayProfile(): SceneAction;
     }
 
     // Combine multiple actions into one
-    export function actions(fs: Action[]): Action {
-        return () => fs.forEach(f => f());
+    export function actions(fs: SceneAction[]): SceneAction {
+        return c => fs.forEach(f => f(c));
     }
 
     export class Profile {
