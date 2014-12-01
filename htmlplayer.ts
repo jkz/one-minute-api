@@ -117,9 +117,10 @@ module OneMinuteScript {
         constructor(private p: HtmlTextPlayer, public scene: Scene, private container: HTMLElement) {
             var sceneDef = scene(p);
             if (undefined !== sceneDef.name) {
-                this.actions.push(function (sp: ScenePlayer) {
-                    sp.addMessage('SCENE: ' + sceneDef.name, 'scene');
-                });
+                var el = document.createElement('p');
+                el.classList.add('scene');
+                el.textContent = 'SCENE: ' + sceneDef.name;
+                this.container.appendChild(el);
             }
             this.actions.push.apply(this.actions, sceneDef.content);
             // Default last action
