@@ -6,7 +6,7 @@
 
 module OneMinuteScript {
 
-    var FirstNeighborProfile = new Profile("Hi! My name is Max and this is my 6 second profile! See you around.");
+    var FirstNeighborProfile = { profileMsg: "Hi! My name is Max and this is my 6 second profile! See you around." };
 
     export var NewUserScene: Scene = function (p: Player) {
         return {
@@ -119,4 +119,46 @@ module OneMinuteScript {
         };
     };
 
+    // Someone, whom you already liked, just liked you and left you a message
+    export var IncomingMatchScene = function (p: Player, match: Match, back: Scene): SceneDefinition {
+        return {
+            name: "Incoming Match",
+            pause: p.pause(),
+            prev: p.goToScene(back),
+            next: p.goToScene(x => SendMessageScene(x, match.profile, back)),
+            content: [
+                p.ambient("light beeping sound, like a pager"),
+                p.voiceOver("You have a new match!"),
+                p.listenToMatch(match),
+                p.voiceOver("Let's send them a reply."),
+            ],
+        };
+    };
+
+    // You liked someone who already liked you
+    export var OutgoingMatchScene = function (p: Player, match: Match, back: Scene): SceneDefinition {
+        return {
+            name: "Outgoing Match",
+            pause: p.pause(),
+            prev: p.goToScene(back),
+            next: p.goToScene(x => SendMessageScene(x, match.profile, back)),
+            content: [
+                p.ambient("light sound of victory"), // because this directly follows a "like"
+                p.voiceOver("That's a match! They won't hear about it until you leave them a message, so let's record one now."),
+            ],
+        };
+    };
+
+    export var SendMessageScene = function (p: Player, to: Profile, back: Scene): SceneDefinition {
+        return {
+            name: "Send message",
+            pause: p.pause(),
+            prev: p.goToScene(back),
+            next: p.goToScene(back),
+            content: [
+                p.recordMessage(to),
+                p.voiceOver("Your message has been sent. Let's continue where we were."),
+            ],
+        };
+    }
 }

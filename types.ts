@@ -35,7 +35,8 @@ module OneMinuteScript {
     }
 
     // Everything must be a method to allow capturing this in initialization etc
-    // etc
+    // etc (imagine what happens in JS when you do action = p.someMethod; you
+    // capture Player.prototype.someMethod without binding to p).
     export interface Player {
         goToScene(scene: Scene): SceneAction;
         setSexualPreference(pref: SexualPreference): SceneAction;
@@ -44,6 +45,8 @@ module OneMinuteScript {
         ambient(desc: string): SceneAction;
         playProfile(profile: Profile): SceneAction;
         getAndPlayProfile(): SceneAction;
+        recordMessage(to: Profile): SceneAction;
+        listenToMatch(match: Match): SceneAction;
     }
 
     // Combine multiple actions into one
@@ -51,8 +54,14 @@ module OneMinuteScript {
         return c => fs.forEach(f => f(c));
     }
 
-    export class Profile {
-        constructor(public msg: string) { }
+    export interface Match {
+        profile: Profile;
+        msg: string;
+    }
+
+    export interface Profile {
+        id?: string;
+        profileMsg: string;
     }
 
 }
