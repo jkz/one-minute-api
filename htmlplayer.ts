@@ -37,7 +37,7 @@ module OneMinuteScript {
 
         private setNewChar() {
             if (this.i++ < this.msg.length) {
-                this.el.innerText = this.msg.slice(0, this.i);
+                this.el.textContent = this.msg.slice(0, this.i);
             } else {
                 clearInterval(this.interId);
                 this.resolve();
@@ -234,7 +234,7 @@ module OneMinuteScript {
             if (++this.numScenes > HtmlTextPlayer.MAX_SCENES) {
                 var p = document.createElement('p');
                 p.classList.add('error');
-                p.innerText = 'STOP: Maximum number of scene transitions reached.';
+                p.textContent = 'STOP: Maximum number of scene transitions reached.';
                 this.container.appendChild(p);
                 return;
             }
