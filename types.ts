@@ -45,7 +45,7 @@ module OneMinuteScript {
         voiceOver(text: string): SceneAction;
         ambient(desc: string): SceneAction;
         playProfile(profile: Profile): SceneAction;
-        getAndPlayProfile(): SceneAction;
+        getAndPlayTarget(): SceneAction;
         recordMessage(toUserUuid: string): SceneAction;
         listenToMatch(match: Match): SceneAction;
     }
@@ -80,6 +80,12 @@ module OneMinuteScript {
         http_headers: { [key: string]: string };
     }
 
+    // Not actually a Recording object, just a structural type to discern it from string
+    export interface Recording {
+        recording_uuid: string;
+        // TODO: audio schmaudio
+    }
+
     export interface Api {
         getProfile(userUuid: string): Promise<Profile>;
         getMyProfile(): Promise<Profile>;
@@ -89,7 +95,7 @@ module OneMinuteScript {
         getMatches(newerThan?: string): Promise<Match[]>;
         setMatch(userUuid: string, like: boolean): Promise<void>;
         getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams>;
-        getRecording(recordingUuid: string): Promise<any>; // TODO: audio schmaudio
-        getTargets(): Promise<string[]>;
+        getRecording(recordingUuid: string): Promise<Recording>;
+        getTargets(): Promise<Profile[]>;
     }
 }

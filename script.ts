@@ -90,9 +90,9 @@ module OneMinuteScript {
             content: [
                 p.ambient("bus noises, chatter made up of profiles mixed together"),
                 // Listen to three people on the bus
-                p.getAndPlayProfile(),
-                p.getAndPlayProfile(),
-                p.getAndPlayProfile(),
+                p.getAndPlayTarget(),
+                p.getAndPlayTarget(),
+                p.getAndPlayTarget(),
             ],
         };
     };
@@ -118,7 +118,7 @@ module OneMinuteScript {
             content: [
                 p.ambient("Footsteps on pavement, street noises"),
                 // Listen to three people here
-                p.getAndPlayProfile(),
+                p.getAndPlayTarget(),
             ],
         };
     };

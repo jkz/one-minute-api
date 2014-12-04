@@ -181,7 +181,7 @@ module OneMinuteScript {
         private static MAX_SCENES = 10;
         private numScenes = 0;
         private sexualPreference: SexualPreference;
-        private targets: string[] = [];
+        private targets: Profile[] = [];
 
         constructor(public api: Api, scene: Scene) {
             document.body.innerHTML = '';
@@ -212,8 +212,8 @@ module OneMinuteScript {
                 }
                 e.preventDefault();
             };
-            api.getTargets().then(function (userUuids: string[]) {
-                p.targets = userUuids;
+            api.getTargets().then(function (targets) {
+                p.targets = targets;
             }, function (err) {
                 console.log(err);
             });
@@ -279,18 +279,18 @@ module OneMinuteScript {
         }
 
         // TODO: Communicate to caller when target list exhausted
-        private _getAndPlayProfile() {
+        private _getAndPlayTarget() {
             var p = this;
-            var profile: Profile = {
-                profileMsg: "test profile",
-                recordings: [],
-                user_uuid: "user/x/test-profile"
+            var target = this.targets.shift();
+            if (undefined === target) {
+                console.log("No more targets. TODO: Report upstream");
+                return;
             }
-            p.playProfile(profile)(this.sp);
+            p.playProfile(target)(this.sp);
         }
 
-        getAndPlayProfile(): SceneAction {
-            return c => this._getAndPlayProfile();
+        getAndPlayTarget(): SceneAction {
+            return c => this._getAndPlayTarget();
         }
 
         private sendMessage(toUserUuid: string, msg: string) {

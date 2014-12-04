@@ -8,6 +8,16 @@
 
 
 module OneMinuteScript {
+    var numMockTargetProfiles = 0;
+    function createMockTargetProfile(): Profile {
+        var i = ++numMockTargetProfiles;
+        return {
+            user_uuid: "user/x/mock-target-" + i,
+            recordings: [],
+            profileMsg: "[obsolete prop .profileMsg] msg for mock target " + i,
+        };
+    }
+
     export class MockApi implements Api {
         private user_uuid = "user/x/test-123";
         private settings: Settings = {
@@ -16,6 +26,11 @@ module OneMinuteScript {
             discover_men: true,
             discover_women: true
         };
+        private targets: Profile[] = [
+            createMockTargetProfile(),
+            createMockTargetProfile(),
+            createMockTargetProfile()
+        ];
 
         getProfile(userUuid: string): Promise<Profile> {
             var x: Profile = {
@@ -82,12 +97,19 @@ module OneMinuteScript {
             return new Promise<PutRecordingParams>(ok => ok(x));
         }
 
-        getRecording(recordingUuid: string): Promise<any> {
-            return new Promise((ok, bad) => bad(new Error("mock getRecording not implemented")));
+        getRecording(recordingUuid: string): Promise<Recording> {
+            return new Promise(function (ok, bad) {
+                ok({ recordingUuid: recordingUuid });
+            });
         }
 
-        getTargets(): Promise<string[]> {
-            return new Promise<string[]>((ok, bad) => bad(new Error("mock getTargets not implemented")));
+        getTargets(): Promise<Profile[]> {
+            var api = this;
+            return new Promise<Profile[]>(function (ok) {
+                var targets = api.targets;
+                this.targets = [];
+                ok(targets);
+            });
         }
     }
 }
