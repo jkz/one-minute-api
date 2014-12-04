@@ -6,7 +6,11 @@
 
 module OneMinuteScript {
 
-    var FirstNeighborProfile = { profileMsg: "Hi! My name is Max and this is my 6 second profile! See you around." };
+    var FirstNeighborProfile: Profile = {
+        user_uuid: "user/x/first-neighbor",
+        profileMsg: "Hi! My name is Max and this is my 6 second profile! See you around.",
+        recordings: ["recording/x/first-neighbor"]
+    };
 
     export var NewUserScene: Scene = function (p: Player) {
         return {
@@ -125,7 +129,7 @@ module OneMinuteScript {
             name: "Incoming Match",
             pause: p.pause(),
             prev: p.goToScene(back),
-            next: p.goToScene(x => SendMessageScene(x, match.profile, back)),
+            next: p.goToScene(x => SendMessageScene(x, match.user_uuid, back)),
             content: [
                 p.ambient("light beeping sound, like a pager"),
                 p.voiceOver("You have a new match!"),
@@ -141,7 +145,7 @@ module OneMinuteScript {
             name: "Outgoing Match",
             pause: p.pause(),
             prev: p.goToScene(back),
-            next: p.goToScene(x => SendMessageScene(x, match.profile, back)),
+            next: p.goToScene(x => SendMessageScene(x, match.user_uuid, back)),
             content: [
                 p.ambient("light sound of victory"), // because this directly follows a "like"
                 p.voiceOver("That's a match! They won't hear about it until you leave them a message, so let's record one now."),
@@ -149,14 +153,14 @@ module OneMinuteScript {
         };
     };
 
-    export var SendMessageScene = function (p: Player, to: Profile, back: Scene): SceneDefinition {
+    export var SendMessageScene = function (p: Player, toUserUuid: string, back: Scene): SceneDefinition {
         return {
             name: "Send message",
             pause: p.pause(),
             prev: p.goToScene(back),
             next: p.goToScene(back),
             content: [
-                p.recordMessage(to),
+                p.recordMessage(toUserUuid),
                 p.voiceOver("Your message has been sent. Let's continue where we were."),
             ],
         };

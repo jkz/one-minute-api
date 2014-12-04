@@ -3,8 +3,8 @@
 // all rights reserved
 
 /// <reference path="htmlplayer.ts"/>
+/// <reference path="mock-api.ts"/>
 
-var max = new OneMinuteScript.HtmlTextPlayer(
-        OneMinuteScript.NewUserScene,
-        OneMinuteScript.SexualPreference.Straight);
-max.play();
+var api = new OneMinuteScript.MockApi();
+var p = new OneMinuteScript.HtmlTextPlayer(api, OneMinuteScript.NewUserScene);
+p.play();

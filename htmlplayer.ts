@@ -180,8 +180,10 @@ module OneMinuteScript {
         private container: HTMLElement;
         private static MAX_SCENES = 10;
         private numScenes = 0;
+        private sexualPreference: SexualPreference;
+        private targets: string[] = [];
 
-        constructor(scene: Scene, private sexualPreference: SexualPreference) {
+        constructor(public api: Api, scene: Scene) {
             document.body.innerHTML = '';
             var p = this;
             p.container = document.createElement('div');
@@ -210,18 +212,22 @@ module OneMinuteScript {
                 }
                 e.preventDefault();
             };
+            api.getTargets().then(function (userUuids: string[]) {
+                p.targets = userUuids;
+            }, function (err) {
+                console.log(err);
+            });
+            //TODO Get sexuality from profile
             document.body.appendChild(p.container);
             this.sp = new ScenePlayer(this, scene, this.container);
         }
 
         private demoIncomingMatch() {
-            var match = {
-                msg: "Hi gansta playa playa certified criminal gangsta playa, what the haps ma double-D D-O-double-G? You down for some double-G D in your V?",
-                profile: {
-                    id: "Josh the accountant",
-                    profileMsg: "Hey I'm Josh I'm an accountant",
-                },
-            };
+            var match: Match = {
+                match_uuid: "match/x/test-match-1",
+                user_uuid: "user/x/test-123",
+                opening_line: "recording/x/test-123"
+            }
             this._goToScene(p => IncomingMatchScene(p, match, this.sp.scene));
         }
 
@@ -272,9 +278,14 @@ module OneMinuteScript {
             return c => (<ScenePlayer>c).playPause();
         }
 
+        // TODO: Communicate to caller when target list exhausted
         private _getAndPlayProfile() {
             var p = this;
-            var profile = { profileMsg: "TODO: Implement get next profile" };
+            var profile: Profile = {
+                profileMsg: "test profile",
+                recordings: [],
+                user_uuid: "user/x/test-profile"
+            }
             p.playProfile(profile)(this.sp);
         }
 
@@ -282,20 +293,20 @@ module OneMinuteScript {
             return c => this._getAndPlayProfile();
         }
 
-        private sendMessage(to: Profile, msg: string) {
-            this.sp.addMessage("TODO: Send message <" + msg + "> to <" + (to.id || "UNKNOWN") + ">", "error");
+        private sendMessage(toUserUuid: string, msg: string) {
+            this.sp.addMessage("TODO: Send message <" + msg + "> to " + toUserUuid, "error");
         }
 
-        private _recordMessage(sp: ScenePlayer, to: Profile) {
-            sp.recordMessage().then(msg => this.sendMessage(to, msg));
+        private _recordMessage(sp: ScenePlayer, toUserUuid: string) {
+            sp.recordMessage().then(msg => this.sendMessage(toUserUuid, msg));
         }
 
-        recordMessage(to: Profile): SceneAction {
-            return c => this._recordMessage(c, to);
+        recordMessage(toUserUuid: string): SceneAction {
+            return c => this._recordMessage(c, toUserUuid);
         }
 
         listenToMatch(match: Match): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(match.msg, "match-message");
+            return c => (<ScenePlayer>c).addMessage(match.opening_line, "match-message");
         }
     }
 
