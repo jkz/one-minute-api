@@ -46,7 +46,7 @@ module OneMinuteScript {
         ambient(snd: BuiltinSound): SceneAction;
         playProfile(profile: Profile): SceneAction;
         getAndPlayTarget(): SceneAction;
-        recordMessage(toUserUuid: string): SceneAction;
+        recordMessage(toUserExid: string): SceneAction;
         listenToMatch(match: Match): SceneAction;
     }
 
@@ -56,56 +56,56 @@ module OneMinuteScript {
     }
 
     export interface Profile {
-        user_uuid: string;
+        user_exid: string;
         recordings: RecordingMeta[];
     }
 
     export interface Settings {
-        user_uuid: string;
+        user_exid: string;
         discover_men: boolean;
         discover_women: boolean;
-        recording_uuids: string[];
+        recording_exids: string[];
     }
 
     export interface Match {
-        match_uuid: string;
-        user_uuid: string;
+        match_exid: string;
+        user_exid: string;
         opening_line: RecordingMeta;
     }
 
     export interface PutRecordingParams {
         resource: string;
-        recording_uuid: string;
+        recording_exid: string;
         http_headers: { [key: string]: string };
     }
 
     // Not actually a Recording object, just a structural type to discern it from string
     export interface RecordingData {
-        recording_uuid: string;
+        recording_exid: string;
         tstypehack: number;
         // TODO: audio schmaudio
     }
 
     export interface BuiltinSound {
-        recording_uuid: string;
+        recording_exid: string;
         transcript: string;
     }
 
     export interface RecordingMeta {
-        recording_uuid: string;
+        recording_exid: string;
         length: number;
     }
 
     export interface Api {
-        getProfile(userUuid: string): Promise<Profile>;
+        getProfile(userExid: string): Promise<Profile>;
         getMyProfile(): Promise<Profile>;
         getSettings(): Promise<Settings>;
         setSettings(x: Settings): Promise<void>;
         deleteAccount(): Promise<void>;
         getMatches(newerThan?: string): Promise<Match[]>;
-        setMatch(userUuid: string, like: boolean): Promise<void>;
+        setMatch(userExid: string, like: boolean): Promise<void>;
         getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams>;
-        getRecording(recordingUuid: string): Promise<RecordingData>;
+        getRecording(recordingExid: string): Promise<RecordingData>;
         getTargets(): Promise<Profile[]>;
     }
 }

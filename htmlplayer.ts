@@ -141,12 +141,12 @@ module OneMinuteScript {
         }
 
         playRecording(rec: RecordingMeta, cls: string) {
-            var text = "[TODO: Playback audio for " + rec.recording_uuid + "]";
+            var text = "[TODO: Playback audio for " + rec.recording_exid + "]";
             this.addTextMessage(text, cls);
         }
 
         playBuiltin(snd: BuiltinSound, cls: string) {
-            var text = "[" + snd.recording_uuid + "] " + snd.transcript;
+            var text = "[" + snd.recording_exid + "] " + snd.transcript;
             this.addTextMessage(text, cls);
         }
 
@@ -234,10 +234,10 @@ module OneMinuteScript {
 
         private demoIncomingMatch() {
             var match: Match = {
-                match_uuid: "match/x/test-match-1",
-                user_uuid: "user/x/test-123",
+                match_exid: "match/x/test-match-1",
+                user_exid: "user/x/test-123",
                 opening_line: {
-                    recording_uuid: "recording/x/test-opening-line",
+                    recording_exid: "recording/x/test-opening-line",
                     length: 123
                 }
             }
@@ -310,16 +310,16 @@ module OneMinuteScript {
             return c => this._getAndPlayTarget();
         }
 
-        private sendMessage(toUserUuid: string, msg: string) {
-            this.displayError("TODO: Send message <" + msg + "> to " + toUserUuid);
+        private sendMessage(toUserExid: string, msg: string) {
+            this.displayError("TODO: Send message <" + msg + "> to " + toUserExid);
         }
 
-        private _recordMessage(sp: ScenePlayer, toUserUuid: string) {
-            sp.recordMessage().then(msg => this.sendMessage(toUserUuid, msg));
+        private _recordMessage(sp: ScenePlayer, toUserExid: string) {
+            sp.recordMessage().then(msg => this.sendMessage(toUserExid, msg));
         }
 
-        recordMessage(toUserUuid: string): SceneAction {
-            return c => this._recordMessage(c, toUserUuid);
+        recordMessage(toUserExid: string): SceneAction {
+            return c => this._recordMessage(c, toUserExid);
         }
 
         listenToMatch(match: Match): SceneAction {

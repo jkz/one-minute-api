@@ -8,9 +8,9 @@
 
 
 module OneMinuteScript {
-    function rec(recordingUuid: string): RecordingMeta {
+    function rec(recordingExid: string): RecordingMeta {
         return {
-            recording_uuid: recordingUuid,
+            recording_exid: recordingExid,
             length: 123
         };
     }
@@ -19,16 +19,16 @@ module OneMinuteScript {
     function createMockTargetProfile(): Profile {
         var i = ++numMockTargetProfiles;
         return {
-            user_uuid: "user/x/mock-target-" + i,
+            user_exid: "user/x/mock-target-" + i,
             recordings: [rec("recording/x/mock-target-" + i)],
         };
     }
 
     export class MockApi implements Api {
-        private user_uuid = "user/x/test-123";
+        private user_exid = "user/x/test-123";
         private settings: Settings = {
-            user_uuid: this.user_uuid,
-            recording_uuids: ["recording/x/mock-settings-1", "recording/x/mock-settings-2"],
+            user_exid: this.user_exid,
+            recording_exids: ["recording/x/mock-settings-1", "recording/x/mock-settings-2"],
             discover_men: true,
             discover_women: true
         };
@@ -38,15 +38,15 @@ module OneMinuteScript {
             createMockTargetProfile()
         ];
 
-        getProfile(userUuid: string): Promise<Profile> {
+        getProfile(userExid: string): Promise<Profile> {
             var x: Profile = {
-                user_uuid: this.settings.user_uuid,
-                recordings: this.settings.recording_uuids.map(rec),
+                user_exid: this.settings.user_exid,
+                recordings: this.settings.recording_exids.map(rec),
                 profileMsg: "[obsolete property .profileMsg] test user"
             };
             var api = this;
             return new Promise<Profile>(function (ok, bad) {
-                if (userUuid !== api.user_uuid) {
+                if (userExid !== api.user_exid) {
                     bad(new Error("mock getProfile only implemented for self"));
                 } else {
                     ok(x);
@@ -55,7 +55,7 @@ module OneMinuteScript {
         }
 
         getMyProfile(): Promise<Profile> {
-            return this.getProfile(this.user_uuid);
+            return this.getProfile(this.user_exid);
         }
 
         getSettings(): Promise<Settings> {
@@ -65,8 +65,8 @@ module OneMinuteScript {
         setSettings(x: Settings): Promise<void> {
             var api = this;
             return new Promise<void>(function (ok, bad) {
-                if (x.user_uuid !== api.user_uuid) {
-                    bad(new Error("Can't change user_uuid"));
+                if (x.user_exid !== api.user_exid) {
+                    bad(new Error("Can't change user_exid"));
                 } else {
                     ok();
                 }
@@ -83,14 +83,14 @@ module OneMinuteScript {
             return new Promise<Match[]>(ok => ok([]));
         }
 
-        setMatch(userUuid: string, like: boolean): Promise<void> {
+        setMatch(userExid: string, like: boolean): Promise<void> {
             return new Promise<void>((ok, bad) => bad(new Error("mock setMatch not implemented")));
         }
 
         getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams> {
             var x: PutRecordingParams = {
                 resource: "https://example.com/recording/x/test-123.mp3",
-                recording_uuid: "recording/x/test-123",
+                recording_exid: "recording/x/test-123",
                 http_headers: {
                     "Content-Length": "72362",
                     "Content-MD5": "14758f1afd44c09b7992073ccf00b43d",
@@ -103,9 +103,9 @@ module OneMinuteScript {
             return new Promise<PutRecordingParams>(ok => ok(x));
         }
 
-        getRecording(recordingUuid: string): Promise<RecordingData> {
+        getRecording(recordingExid: string): Promise<RecordingData> {
             return new Promise<RecordingData>(function (ok, bad) {
-                ok({ recording_uuid: recordingUuid, tstypehack: 123 });
+                ok({ recording_exid: recordingExid, tstypehack: 123 });
             });
         }
 

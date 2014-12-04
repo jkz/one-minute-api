@@ -7,18 +7,18 @@
 module OneMinuteScript {
 
     var FirstNeighborProfile: Profile = {
-        user_uuid: "user/x/first-neighbor",
+        user_exid: "user/x/first-neighbor",
         recordings: [{
-            recording_uuid: "recording/x/first-neighbor",
+            recording_exid: "recording/x/first-neighbor",
             length: 123
         }]
     };
 
-    function snd(uuid: string, transcript: string): BuiltinSound {
+    function snd(exid: string, transcript: string): BuiltinSound {
         // TODO: Lookup length for these audio files
         return {
             length: 123,
-            recording_uuid: uuid,
+            recording_exid: exid,
             transcript: transcript
         };
     }
@@ -145,7 +145,7 @@ module OneMinuteScript {
             name: "Incoming Match",
             pause: p.pause(),
             prev: p.goToScene(back),
-            next: p.goToScene(x => SendMessageScene(x, match.user_uuid, back)),
+            next: p.goToScene(x => SendMessageScene(x, match.user_exid, back)),
             content: [
                 p.ambient(snd("sound/ambient/incoming-match", "light beeping sound, like a pager")),
                 p.voiceOver(snd("sound/vo/incoming-match", "You have a new match!")),
@@ -161,7 +161,7 @@ module OneMinuteScript {
             name: "Outgoing Match",
             pause: p.pause(),
             prev: p.goToScene(back),
-            next: p.goToScene(x => SendMessageScene(x, match.user_uuid, back)),
+            next: p.goToScene(x => SendMessageScene(x, match.user_exid, back)),
             content: [
                 // because this directly follows a "like"
                 p.ambient(snd("sound/ambient/outgoing-match", "light sound of victory")),
@@ -171,14 +171,14 @@ module OneMinuteScript {
         };
     };
 
-    export var SendMessageScene = function (p: Player, toUserUuid: string, back: Scene): SceneDefinition {
+    export var SendMessageScene = function (p: Player, toUserExid: string, back: Scene): SceneDefinition {
         return {
             name: "Send message",
             pause: p.pause(),
             prev: p.goToScene(back),
             next: p.goToScene(back),
             content: [
-                p.recordMessage(toUserUuid),
+                p.recordMessage(toUserExid),
                 p.voiceOver(snd("sound/vo/message-sent", "Your message has been sent. Let's continue where we were.")),
             ],
         };
