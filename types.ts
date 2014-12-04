@@ -42,8 +42,8 @@ module OneMinuteScript {
         goToScene(scene: Scene): SceneAction;
         setSexualPreference(pref: SexualPreference): SceneAction;
         pause(): SceneAction;
-        voiceOver(text: string): SceneAction;
-        ambient(desc: string): SceneAction;
+        voiceOver(snd: BuiltinSound): SceneAction;
+        ambient(snd: BuiltinSound): SceneAction;
         playProfile(profile: Profile): SceneAction;
         getAndPlayTarget(): SceneAction;
         recordMessage(toUserUuid: string): SceneAction;
@@ -57,33 +57,43 @@ module OneMinuteScript {
 
     export interface Profile {
         user_uuid: string;
-        recordings: string[];
-        profileMsg: string;
+        recordings: RecordingMeta[];
     }
 
     export interface Settings {
         user_uuid: string;
         discover_men: boolean;
         discover_women: boolean;
-        recordings: string[];
+        recording_uuids: string[];
     }
 
     export interface Match {
         match_uuid: string;
         user_uuid: string;
-        opening_line: string;
+        opening_line: RecordingMeta;
     }
 
     export interface PutRecordingParams {
         resource: string;
-        message_uuid: string;
+        recording_uuid: string;
         http_headers: { [key: string]: string };
     }
 
     // Not actually a Recording object, just a structural type to discern it from string
-    export interface Recording {
+    export interface RecordingData {
         recording_uuid: string;
+        tstypehack: number;
         // TODO: audio schmaudio
+    }
+
+    export interface BuiltinSound {
+        recording_uuid: string;
+        transcript: string;
+    }
+
+    export interface RecordingMeta {
+        recording_uuid: string;
+        length: number;
     }
 
     export interface Api {
@@ -95,7 +105,7 @@ module OneMinuteScript {
         getMatches(newerThan?: string): Promise<Match[]>;
         setMatch(userUuid: string, like: boolean): Promise<void>;
         getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams>;
-        getRecording(recordingUuid: string): Promise<Recording>;
+        getRecording(recordingUuid: string): Promise<RecordingData>;
         getTargets(): Promise<Profile[]>;
     }
 }

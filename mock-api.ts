@@ -8,13 +8,19 @@
 
 
 module OneMinuteScript {
+    function rec(recordingUuid: string): RecordingMeta {
+        return {
+            recording_uuid: recordingUuid,
+            length: 123
+        };
+    }
+
     var numMockTargetProfiles = 0;
     function createMockTargetProfile(): Profile {
         var i = ++numMockTargetProfiles;
         return {
             user_uuid: "user/x/mock-target-" + i,
-            recordings: [],
-            profileMsg: "[obsolete prop .profileMsg] msg for mock target " + i,
+            recordings: [rec("recording/x/mock-target-" + i)],
         };
     }
 
@@ -22,7 +28,7 @@ module OneMinuteScript {
         private user_uuid = "user/x/test-123";
         private settings: Settings = {
             user_uuid: this.user_uuid,
-            recordings: ["recording/x/test-1", "recording/x/test-2"],
+            recording_uuids: ["recording/x/mock-settings-1", "recording/x/mock-settings-2"],
             discover_men: true,
             discover_women: true
         };
@@ -35,7 +41,7 @@ module OneMinuteScript {
         getProfile(userUuid: string): Promise<Profile> {
             var x: Profile = {
                 user_uuid: this.settings.user_uuid,
-                recordings: this.settings.recordings,
+                recordings: this.settings.recording_uuids.map(rec),
                 profileMsg: "[obsolete property .profileMsg] test user"
             };
             var api = this;
@@ -84,7 +90,7 @@ module OneMinuteScript {
         getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams> {
             var x: PutRecordingParams = {
                 resource: "https://example.com/recording/x/test-123.mp3",
-                message_uuid: "recording/x/test-123",
+                recording_uuid: "recording/x/test-123",
                 http_headers: {
                     "Content-Length": "72362",
                     "Content-MD5": "14758f1afd44c09b7992073ccf00b43d",
@@ -97,9 +103,9 @@ module OneMinuteScript {
             return new Promise<PutRecordingParams>(ok => ok(x));
         }
 
-        getRecording(recordingUuid: string): Promise<Recording> {
-            return new Promise(function (ok, bad) {
-                ok({ recordingUuid: recordingUuid });
+        getRecording(recordingUuid: string): Promise<RecordingData> {
+            return new Promise<RecordingData>(function (ok, bad) {
+                ok({ recording_uuid: recordingUuid, tstypehack: 123 });
             });
         }
 

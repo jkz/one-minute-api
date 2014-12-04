@@ -132,12 +132,22 @@ module OneMinuteScript {
             };
         }
 
-        addMessage(text: string, cls: string) {
+        private addTextMessage(transcript: string, cls: string) {
             this.stop();
-            var action = new TeleTypeAction(this.container, text, cls);
+            var action = new TeleTypeAction(this.container, transcript, cls);
             action.done.then(() => this.next());
             this.runningAction = action;
             action.play();
+        }
+
+        playRecording(rec: RecordingMeta, cls: string) {
+            var text = "[TODO: Playback audio for " + rec.recording_uuid + "]";
+            this.addTextMessage(text, cls);
+        }
+
+        playBuiltin(snd: BuiltinSound, cls: string) {
+            var text = "[" + snd.recording_uuid + "] " + snd.transcript;
+            this.addTextMessage(text, cls);
         }
 
         recordMessage(): Promise<string> {
@@ -226,7 +236,10 @@ module OneMinuteScript {
             var match: Match = {
                 match_uuid: "match/x/test-match-1",
                 user_uuid: "user/x/test-123",
-                opening_line: "recording/x/test-123"
+                opening_line: {
+                    recording_uuid: "recording/x/test-opening-line",
+                    length: 123
+                }
             }
             this._goToScene(p => IncomingMatchScene(p, match, this.sp.scene));
         }
@@ -235,13 +248,17 @@ module OneMinuteScript {
             this.sp.play();
         }
 
+        private displayError(text: string) {
+            var p = document.createElement('p');
+            p.classList.add('error');
+            p.textContent = text;
+            this.container.appendChild(p);
+        }
+
         private _goToScene(scene: Scene) {
             this.sp.stop();
             if (++this.numScenes > HtmlTextPlayer.MAX_SCENES) {
-                var p = document.createElement('p');
-                p.classList.add('error');
-                p.textContent = 'STOP: Maximum number of scene transitions reached.';
-                this.container.appendChild(p);
+                this.displayError('STOP: Maximum number of scene transitions reached.');
                 return;
             }
             this.sp = new ScenePlayer(this, scene, this.container);
@@ -252,16 +269,16 @@ module OneMinuteScript {
             return c => this._goToScene(scene);
         }
 
-        voiceOver(text: string): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(text, 'voiceOver');
+        voiceOver(snd: BuiltinSound): SceneAction {
+            return c => (<ScenePlayer>c).playBuiltin(snd, 'voiceOver');
         }
 
-        ambient(desc: string): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(desc, 'ambient');
+        ambient(snd: BuiltinSound): SceneAction {
+            return c => (<ScenePlayer>c).playBuiltin(snd, 'ambient');
         }
 
         playProfile(profile: Profile): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(profile.profileMsg, 'profile');
+            return c => (<ScenePlayer>c).playRecording(profile.recordings[0], 'profile');
         }
 
         setSexualPreference(pref: SexualPreference): SceneAction {
@@ -283,7 +300,7 @@ module OneMinuteScript {
             var p = this;
             var target = this.targets.shift();
             if (undefined === target) {
-                console.log("No more targets. TODO: Report upstream");
+                this.displayError("No more targets. TODO: Report up the callstack");
                 return;
             }
             p.playProfile(target)(this.sp);
@@ -294,7 +311,7 @@ module OneMinuteScript {
         }
 
         private sendMessage(toUserUuid: string, msg: string) {
-            this.sp.addMessage("TODO: Send message <" + msg + "> to " + toUserUuid, "error");
+            this.displayError("TODO: Send message <" + msg + "> to " + toUserUuid);
         }
 
         private _recordMessage(sp: ScenePlayer, toUserUuid: string) {
@@ -306,7 +323,7 @@ module OneMinuteScript {
         }
 
         listenToMatch(match: Match): SceneAction {
-            return c => (<ScenePlayer>c).addMessage(match.opening_line, "match-message");
+            return c => (<ScenePlayer>c).playRecording(match.opening_line, "match-message");
         }
     }
 

@@ -8,9 +8,20 @@ module OneMinuteScript {
 
     var FirstNeighborProfile: Profile = {
         user_uuid: "user/x/first-neighbor",
-        profileMsg: "Hi! My name is Max and this is my 6 second profile! See you around.",
-        recordings: ["recording/x/first-neighbor"]
+        recordings: [{
+            recording_uuid: "recording/x/first-neighbor",
+            length: 123
+        }]
     };
+
+    function snd(uuid: string, transcript: string): BuiltinSound {
+        // TODO: Lookup length for these audio files
+        return {
+            length: 123,
+            recording_uuid: uuid,
+            transcript: transcript
+        };
+    }
 
     export var NewUserScene: Scene = function (p: Player) {
         return {
@@ -19,10 +30,11 @@ module OneMinuteScript {
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(ExploreNeighborhood1Scene),
             content: [
-                p.voiceOver("Welcome to your house. Before we explore your house, let's go explore the neighborhood. Follow me."),
-                p.ambient("Footsteps in hallway, 5ft"),
-                p.ambient("Front door opens"),
-                p.ambient("footsteps on gravel (path in frontyard), 10ft"),
+                p.voiceOver(snd("sound/vo/welcome-to-your-house",
+                    "Welcome to your house. Before we explore your house, let's go explore the neighborhood. Follow me.")),
+                p.ambient(snd("sound/ambient/footsteps-in-hallway", "Footsteps in hallway, 5ft")),
+                p.ambient(snd("sound/ambient/front-door-opens", "Front door opens")),
+                p.ambient(snd("sound/ambient/walk-front-yard", "footsteps on gravel (path in frontyard), 10ft")),
             ],
         };
     };
@@ -34,14 +46,16 @@ module OneMinuteScript {
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(BusstopToLafayetteScene),
             content: [
-                p.ambient("Footsteps on the pavement. Background noise: people talking, light street activity. 30ft."),
-                p.voiceOver("This is the first house. Let's check out who lives here."),
+                p.ambient(snd("sound/ambient/first-steps-outside",
+                    "Footsteps on the pavement. Background noise: people talking, light street activity. 30ft.")),
+                p.voiceOver(snd("sound/vo/intro-1st-neighbor",
+                    "This is the first house. Let's check out who lives here.")),
                 /* Profile of owner plays. It's a sample profile that demonstrates to
                  * the user what a profile is, just like Tinder's screenshot of that
                  * lady on the beach with a pug in her arms.
                  */
                 p.playProfile(FirstNeighborProfile),
-                p.ambient("environmental noises fade back in"),
+                p.ambient(snd("sound/ambient/env-noises-fade-in", "environmental noises fade back in")),
             ],
         };
     };
@@ -54,8 +68,9 @@ module OneMinuteScript {
             next: p.goToScene(ExploreNeighborhood2Scene),
             content: [
                 p.setSexualPreference(SexualPreference.Straight),
-                p.ambient("A bus approaches and comes to a soft halt"),
-                p.voiceOver("This bus is going to Lafayette, home to the LGBT community. If you want to hop on, just press pause right here. Otherwise, let's continue!"),
+                p.ambient(snd("sound/abmient/bus-to-lafayette-arrives", "A bus approaches and comes to a soft halt")),
+                p.voiceOver(snd("sound/vo/explina-bus-to-lafayette",
+                    "This bus is going to Lafayette, home to the LGBT community. If you want to hop on, just press pause right here. Otherwise, let's continue!")),
             ],
         };
     };
@@ -72,8 +87,8 @@ module OneMinuteScript {
                  * time the pause button influences the story line instead of just
                  * pausing.
                  */
-                p.voiceOver("Ho!"),
-                p.voiceOver("Okay, let's get on the bus! Remember: to cancel, or go back, just press back. On to Lafayette!"),
+                p.voiceOver(snd("sound/vo/get-on-lafayette",
+                    "Okay, let's get on the bus! Remember: to cancel, or go back, just press back. On to Lafayette!")),
                 /* TODO: Disambiguate in instructions between "prev track" and "android
                  * back button".
                  */
@@ -88,7 +103,7 @@ module OneMinuteScript {
             prev: p.goToScene(BusstopToLafayetteScene),
             next: p.goToScene(ArrivedInLafayetteScene),
             content: [
-                p.ambient("bus noises, chatter made up of profiles mixed together"),
+                p.ambient(snd("sound/ambient/on-the-bus", "bus noises, chatter made up of profiles mixed together")),
                 // Listen to three people on the bus
                 p.getAndPlayTarget(),
                 p.getAndPlayTarget(),
@@ -104,7 +119,8 @@ module OneMinuteScript {
             prev: p.goToScene(InBusToLafayetteScene),
             next: p.goToScene(ExploreNeighborhood2Scene),
             content: [
-                p.voiceOver("Welcome to Lafayette! Home to the LGBT community. Let's explore."),
+                p.voiceOver(snd("sound/vo/welcome-to-lafayette",
+                    "Welcome to Lafayette! Home to the LGBT community. Let's explore.")),
             ],
         };
     };
@@ -116,7 +132,7 @@ module OneMinuteScript {
             prev: p.goToScene(BusstopToLafayetteScene),
             next: p.goToScene(ExploreNeighborhood2Scene),
             content: [
-                p.ambient("Footsteps on pavement, street noises"),
+                p.ambient(snd("sound/ambient/explore-neighborhood", "Footsteps on pavement, street noises")),
                 // Listen to three people here
                 p.getAndPlayTarget(),
             ],
@@ -131,10 +147,10 @@ module OneMinuteScript {
             prev: p.goToScene(back),
             next: p.goToScene(x => SendMessageScene(x, match.user_uuid, back)),
             content: [
-                p.ambient("light beeping sound, like a pager"),
-                p.voiceOver("You have a new match!"),
+                p.ambient(snd("sound/ambient/incoming-match", "light beeping sound, like a pager")),
+                p.voiceOver(snd("sound/vo/incoming-match", "You have a new match!")),
                 p.listenToMatch(match),
-                p.voiceOver("Let's send them a reply."),
+                p.voiceOver(snd("sound/vo/send-reply", "Let's send them a reply.")),
             ],
         };
     };
@@ -147,8 +163,10 @@ module OneMinuteScript {
             prev: p.goToScene(back),
             next: p.goToScene(x => SendMessageScene(x, match.user_uuid, back)),
             content: [
-                p.ambient("light sound of victory"), // because this directly follows a "like"
-                p.voiceOver("That's a match! They won't hear about it until you leave them a message, so let's record one now."),
+                // because this directly follows a "like"
+                p.ambient(snd("sound/ambient/outgoing-match", "light sound of victory")),
+                p.voiceOver(snd("sound/vo/outgoing-match",
+                    "That's a match! They won't hear about it until you leave them a message, so let's record one now.")),
             ],
         };
     };
@@ -161,7 +179,7 @@ module OneMinuteScript {
             next: p.goToScene(back),
             content: [
                 p.recordMessage(toUserUuid),
-                p.voiceOver("Your message has been sent. Let's continue where we were."),
+                p.voiceOver(snd("sound/vo/message-sent", "Your message has been sent. Let's continue where we were.")),
             ],
         };
     }
