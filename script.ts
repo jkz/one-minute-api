@@ -32,9 +32,9 @@ module OneMinuteScript {
             content: [
                 p.voiceOver(snd("sound/vo/welcome-to-your-house",
                     "Welcome to your house. Before we explore your house, let's go explore the neighborhood. Follow me.")),
-                p.ambient(snd("sound/ambient/footsteps-in-hallway", "Footsteps in hallway, 5ft")),
-                p.ambient(snd("sound/ambient/front-door-opens", "Front door opens")),
-                p.ambient(snd("sound/ambient/walk-front-yard", "footsteps on gravel (path in frontyard), 10ft")),
+                p.ambient(snd("sound/ambient/footsteps-in-hallway-1.wav", "Footsteps in hallway, 5ft")),
+                p.ambient(snd("sound/ambient/door-open-close-1-clipped.wav", "Front door opens")),
+                p.ambient(snd("sound/ambient/footsteps-gravel-1-original.wav", "footsteps on gravel (path in frontyard), 10ft")),
             ],
         };
     };

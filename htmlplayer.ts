@@ -17,7 +17,10 @@ module OneMinuteScript {
         play();
         playPause();
         stop();
+        done: Promise<any>;
     }
+
+    var SOUNDS_BASE = "https://oneminuterecordings.s3.amazonaws.com/";
 
     // Write a message to this element in "teletype style", where text appears
     // character for character as if someone is typing it live. The callback is
@@ -100,6 +103,43 @@ module OneMinuteScript {
         }
     }
 
+    class PlaySoundAction implements PlayerAction {
+        private audio: HTMLAudioElement;
+        done: Promise<void>;
+
+        private static soundUrl(snd: BuiltinSound): string {
+            return SOUNDS_BASE + snd.recording_exid;
+        }
+
+        constructor(snd: BuiltinSound) {
+            var audio = new Audio();
+            this.done = new Promise<void>(function (ok, bad) {
+                audio.onended = e => ok();
+                audio.onerror = bad;
+            });
+            audio.src = PlaySoundAction.soundUrl(snd);
+            this.audio = audio;
+        }
+
+        play() {
+            this.audio.play();
+        }
+
+        playPause() {
+            if (this.audio.paused) {
+                this.audio.play();
+            } else {
+                this.audio.pause();
+            }
+        }
+
+        stop() {
+            this.audio.pause();
+            this.audio.src = '';
+            this.audio = undefined;
+        }
+    }
+
     interface ControlButtons {
         playPause: Action;
         prev: Action;
@@ -140,14 +180,23 @@ module OneMinuteScript {
             action.play();
         }
 
+        private writeSoundDescription(snd: BuiltinSound, cls: string) {
+            var text = "[" + snd.recording_exid + "] " + snd.transcript;
+            this.addTextMessage(text, cls);
+        }
+
         playRecording(rec: RecordingMeta, cls: string) {
             var text = "[TODO: Playback audio for " + rec.recording_exid + "]";
             this.addTextMessage(text, cls);
         }
 
         playBuiltin(snd: BuiltinSound, cls: string) {
-            var text = "[" + snd.recording_exid + "] " + snd.transcript;
-            this.addTextMessage(text, cls);
+            var action: PlayerAction = new PlaySoundAction(snd);
+            var onok = () => this.next();
+            var onbad = e => this.writeSoundDescription(snd, cls);
+            action.done.then(onok, onbad);
+            this.runningAction = action;
+            action.play();
         }
 
         recordMessage(): Promise<string> {
