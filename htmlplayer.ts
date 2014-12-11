@@ -20,7 +20,8 @@ module OneMinuteScript {
         done: Promise<any>;
     }
 
-    var SOUNDS_BASE = "https://oneminuterecordings.s3.amazonaws.com/";
+    //var SOUNDS_BASE = "https://oneminuterecordings.s3.amazonaws.com/";
+    var SOUNDS_BASE = "file:///C:/Users/hraban/1min/";
 
     // Write a message to this element in "teletype style", where text appears
     // character for character as if someone is typing it live. The callback is
@@ -166,7 +167,7 @@ module OneMinuteScript {
             // Default last action
             this.actions.push(sceneDef.next);
             this.buttons = {
-                playPause: () => sceneDef.pause(this),
+                playPause: () => this.playPause(),
                 prev: () => sceneDef.prev(this),
                 next: () => sceneDef.next(this),
             };
@@ -338,10 +339,6 @@ module OneMinuteScript {
                 p.container.dataset['sexualPreference'] = SexualPreference[pref];
                 sp.next();
             }
-        }
-
-        pause(): SceneAction {
-            return c => (<ScenePlayer>c).playPause();
         }
 
         // TODO: Communicate to caller when target list exhausted

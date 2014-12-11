@@ -25,7 +25,6 @@ module OneMinuteScript {
     export interface SceneDefinition {
         name?: string;
         content: SceneAction[];
-        pause: SceneAction;
         prev: SceneAction;
         next: SceneAction;
     }
@@ -41,7 +40,6 @@ module OneMinuteScript {
         api: Api;
         goToScene(scene: Scene): SceneAction;
         setSexualPreference(pref: SexualPreference): SceneAction;
-        pause(): SceneAction;
         voiceOver(snd: BuiltinSound): SceneAction;
         ambient(snd: BuiltinSound): SceneAction;
         playProfile(profile: Profile): SceneAction;
