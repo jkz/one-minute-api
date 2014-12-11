@@ -23,3 +23,23 @@
 [data-sexual-preference=Gay] {
     background-color: pink;
 }
+
+#container:not(.preloading) .preloading-message {
+    display: none;
+}
+
+.preloading-message {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding-top: 40%;
+    font-family: sans-serif;
+    color: red;
+    font-size: 4em;
+    margin: 0;
+}

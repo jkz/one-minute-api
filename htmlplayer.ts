@@ -266,12 +266,22 @@ module OneMinuteScript {
             return this.preloaded;
         }
 
+        private static preloadingMsg(): HTMLElement {
+            var e = document.createElement('p');
+            e.classList.add('preloading-message');
+            e.textContent = 'loading...';
+            return e;
+        }
+
         constructor(public api: Api, scene: Scene) {
-            this.preloaded = preloadAudioResources(api, scene);
-            document.body.innerHTML = '';
             var p = this;
+            p.preloaded = preloadAudioResources(api, scene);
+            document.body.innerHTML = '';
             p.container = document.createElement('div');
             p.container.id = 'container';
+            p.container.classList.add("preloading");
+            p.container.appendChild(HtmlTextPlayer.preloadingMsg());
+            p.preloaded.then(() => p.container.classList.remove("preloading"));
             document.body.onkeydown = function (e) {
                 if ((<HTMLElement>e.target).tagName === "INPUT") {
                     // ignore events on input tags
