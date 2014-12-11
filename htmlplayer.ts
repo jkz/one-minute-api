@@ -145,6 +145,7 @@ module OneMinuteScript {
         playPause: Action;
         prev: Action;
         next: Action;
+        action: Action;
     }
 
     // Play one scene
@@ -170,6 +171,7 @@ module OneMinuteScript {
                 playPause: () => this.playPause(),
                 prev: () => sceneDef.prev(this),
                 next: () => sceneDef.next(this),
+                action: () => sceneDef.action && sceneDef.action(this),
             };
         }
 
@@ -263,6 +265,9 @@ module OneMinuteScript {
                         break;
                     case 39: // right
                         p.sp.buttons.next();
+                        break;
+                    case 32: // space
+                        p.sp.buttons.action();
                         break;
                     case 77: // 'm'
                         p.demoIncomingMatch();

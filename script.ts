@@ -61,6 +61,7 @@ module OneMinuteScript {
     export var BusstopToLafayetteScene: Scene = function (p: Player) {
         return {
             name: "Busstop",
+            action: p.goToScene(EnterBusToLafayetteScene),
             prev: p.goToScene(ExploreNeighborhood1Scene),
             next: p.goToScene(ExploreNeighborhood2Scene),
             content: [

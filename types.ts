@@ -24,6 +24,8 @@ module OneMinuteScript {
 
     export interface SceneDefinition {
         name?: string;
+        // User initiated action (the famous "button press")
+        action?: SceneAction;
         content: SceneAction[];
         prev: SceneAction;
         next: SceneAction;
