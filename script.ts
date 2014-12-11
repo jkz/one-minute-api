@@ -29,7 +29,7 @@ module OneMinuteScript {
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(ExploreNeighborhood1Scene),
             content: [
-                p.voiceOver(snd("sound/vo/welcome-to-your-house.mp3",
+                p.voiceOver(snd("sound/vo/welcome-to-your-house-1.mp3",
                     "Welcome to your house. Before we explore your house, let's go explore the neighborhood. Follow me.")),
                 p.ambient(snd("sound/ambient/footsteps-in-hallway-1.wav", "Footsteps in hallway, 5ft")),
                 p.ambient(snd("sound/ambient/door-open-close-1-clipped.wav", "Front door opens")),

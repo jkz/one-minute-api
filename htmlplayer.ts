@@ -6,6 +6,7 @@
 
 /// <reference path="types.ts"/>
 /// <reference path="script.ts"/>
+/// <reference path="resourcefetchingplayer.ts"/>
 
 interface Func<T> {
     (): T;
@@ -20,8 +21,26 @@ module OneMinuteScript {
         done: Promise<any>;
     }
 
-    //var SOUNDS_BASE = "https://oneminuterecordings.s3.amazonaws.com/";
-    var SOUNDS_BASE = "resources/";
+    var SOUNDS_BASE = "https://oneminuterecordings.s3.amazonaws.com/";
+    //var SOUNDS_BASE = "resources/";
+
+    function soundUrl(snd: BuiltinSound): string {
+        return SOUNDS_BASE + snd.recording_exid;
+    }
+
+    function preloadAudioResources(api: Api, scene: Scene): Promise<void> {
+        var resources = new ResourceFetchingPlayer(scene);
+        var i = 0;
+        var j = 0;
+        var readys: Promise<void>[] = resources.sounds.map(function (snd) {
+            var audio = new Audio(soundUrl(snd));
+            return new Promise<void>(function (ok) {
+                // Preloading doesn't care about errors
+                audio.onerror = audio.onloadeddata = e => ok();
+            });
+        });
+        return Promise.all(readys).then(() => { console.log("All resources prefetched."); });
+    }
 
     // Write a message to this element in "teletype style", where text appears
     // character for character as if someone is typing it live. The callback is
@@ -108,17 +127,13 @@ module OneMinuteScript {
         private audio: HTMLAudioElement;
         done: Promise<void>;
 
-        private static soundUrl(snd: BuiltinSound): string {
-            return SOUNDS_BASE + snd.recording_exid;
-        }
-
         constructor(snd: BuiltinSound) {
             var audio = new Audio();
             this.done = new Promise<void>(function (ok, bad) {
                 audio.onended = e => ok();
                 audio.onerror = bad;
             });
-            audio.src = PlaySoundAction.soundUrl(snd);
+            audio.src = soundUrl(snd);
             this.audio = audio;
         }
 
@@ -245,8 +260,14 @@ module OneMinuteScript {
         private numScenes = 0;
         private sexualPreference: SexualPreference;
         private targets: Profile[] = [];
+        private preloaded: Promise<void>;
+
+        preload(): Promise<void> {
+            return this.preloaded;
+        }
 
         constructor(public api: Api, scene: Scene) {
+            this.preloaded = preloadAudioResources(api, scene);
             document.body.innerHTML = '';
             var p = this;
             p.container = document.createElement('div');
@@ -285,7 +306,7 @@ module OneMinuteScript {
             });
             //TODO Get sexuality from profile
             document.body.appendChild(p.container);
-            this.sp = new ScenePlayer(this, scene, this.container);
+            p.sp = new ScenePlayer(p, scene, p.container);
         }
 
         private demoIncomingMatch() {

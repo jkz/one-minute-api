@@ -7,4 +7,4 @@
 
 var api = new OneMinuteScript.MockApi();
 var p = new OneMinuteScript.HtmlTextPlayer(api, OneMinuteScript.NewUserScene);
-p.play();
+p.preload().then(() => p.play());
