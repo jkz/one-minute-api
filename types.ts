@@ -2,6 +2,8 @@
 //
 // all rights reserved
 
+/// <reference path="es6-promise.d.ts"/>
+
 module OneMinuteScript {
 
     export enum SexualPreference {
