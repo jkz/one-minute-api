@@ -75,10 +75,12 @@ module OneMinuteScript {
         opening_line: RecordingMeta;
     }
 
+    export interface HttpHeaders { [key: string]: string };
+
     export interface PutRecordingParams {
         resource: string;
         recording_exid: string;
-        http_headers: { [key: string]: string };
+        http_headers: HttpHeaders;
     }
 
     // Not actually a Recording object, just a structural type to discern it from string
@@ -106,8 +108,8 @@ module OneMinuteScript {
         deleteAccount(): Promise<void>;
         getMatches(newerThan?: string): Promise<Match[]>;
         setMatch(userExid: string, like: boolean): Promise<void>;
-        getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams>;
-        getRecording(recordingExid: string): Promise<RecordingData>;
+        putRecording(file: File): Promise<void>;
+        getRecordingUrl(recordingExid: string): Promise<string>;
         getTargets(): Promise<Profile[]>;
     }
 }

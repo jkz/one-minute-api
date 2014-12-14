@@ -44,9 +44,9 @@ module OneMinuteScript {
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(BusstopToLafayetteScene),
             content: [
-                p.ambient(snd("sound/ambient/first-steps-outside",
+                p.ambient(snd("sound/ambient/footsteps-on-pavement-1-clipped.wav",
                     "Footsteps on the pavement. Background noise: people talking, light street activity. 30ft.")),
-                p.voiceOver(snd("sound/vo/intro-1st-neighbor",
+                p.voiceOver(snd("sound/vo/intro-1st-neighbor-1-clipped.mp3",
                     "This is the first house. Let's check out who lives here.")),
                 /* Profile of owner plays. It's a sample profile that demonstrates to
                  * the user what a profile is, just like Tinder's screenshot of that
@@ -67,8 +67,8 @@ module OneMinuteScript {
             content: [
                 p.setSexualPreference(SexualPreference.Straight),
                 p.ambient(snd("sound/abmient/bus-to-lafayette-arrives", "A bus approaches and comes to a soft halt")),
-                p.voiceOver(snd("sound/vo/explina-bus-to-lafayette",
-                    "This bus is going to Lafayette, home to the LGBT community. If you want to hop on, just press pause right here. Otherwise, let's continue!")),
+                p.voiceOver(snd("sound/vo/explain-bus-to-lafayette",
+                    "This bus is going to Lafayette, home to the LGBT community. If you want to hop on, just press the action button right here. Otherwise, let's continue!")),
             ],
         };
     };

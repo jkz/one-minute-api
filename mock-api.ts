@@ -80,15 +80,15 @@ module OneMinuteScript {
         }
 
         getMatches(newerThan?: string): Promise<Match[]> {
-            return new Promise<Match[]>(ok => ok([]));
+            return Promise.resolve([]);
         }
 
         setMatch(userExid: string, like: boolean): Promise<void> {
-            return new Promise<void>((ok, bad) => bad(new Error("mock setMatch not implemented")));
+            return Promise.reject(new Error("mock setMatch not implemented"));
         }
 
-        getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams> {
-            var x: PutRecordingParams = {
+        private getPutRecordingParams(bytes: number, contentType: string, md5: string): Promise<PutRecordingParams> {
+            return Promise.resolve<PutRecordingParams>({
                 resource: "https://example.com/recording/x/test-123.mp3",
                 recording_exid: "recording/x/test-123",
                 http_headers: {
@@ -99,23 +99,21 @@ module OneMinuteScript {
                     "Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request,SignedHeaders=content-length;content-md5;content-type;host;x-amz-acl,Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41",
                     "X-Amz-Acl": "public-read"
                 }
-            };
-            return new Promise<PutRecordingParams>(ok => ok(x));
+            });
         }
 
-        getRecording(recordingExid: string): Promise<RecordingData> {
-            return new Promise<RecordingData>(function (ok, bad) {
-                ok({ recording_exid: recordingExid, tstypehack: 123 });
-            });
+        putRecording(file: File): Promise<void> {
+            return Promise.reject(new Error("mock putRecording not implemented"));
+        }
+
+        getRecordingUrl(recordingExid: string): Promise<string> {
+            return Promise.resolve("https://www.example.com/" + recordingExid);
         }
 
         getTargets(): Promise<Profile[]> {
-            var api = this;
-            return new Promise<Profile[]>(function (ok) {
-                var targets = api.targets;
-                this.targets = [];
-                ok(targets);
-            });
+            var res = Promise.resolve(this.targets);
+            this.targets = [];
+            return res;
         }
     }
 }
