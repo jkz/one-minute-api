@@ -109,7 +109,7 @@ module OneMinuteScript {
         getMatches(newerThan?: string): Promise<Match[]>;
         setMatch(userExid: string, like: boolean): Promise<void>;
         putRecording(file: File): Promise<void>;
-        getRecordingUrl(recordingExid: string): Promise<string>;
+        getSoundUrl(soundOrRecordingExid: string): Promise<string>;
         getTargets(): Promise<Profile[]>;
     }
 }

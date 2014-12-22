@@ -10,13 +10,11 @@
 module OneMinuteScript {
     var DEFAULT_API_BASE = "https://oneminuteapi.s3.amazonaws.com/";
     var DEFAULT_S3 = "https://oneminuterecordings.s3.amazonaws.com/";
+    var SOUND_EXTENSION = ".mp3";
 
     function obj2querystring(obj) {
         var enc = encodeURIComponent;
-        function val(key: string): string {
-            return enc(obj[key]);
-        }
-        return Object.keys(obj).map(k => enc(k) + "=" + val(k)).join("&");
+        return Object.keys(obj).map(k => enc(k) + "=" + enc(obj[k])).join("&");
     }
 
     interface XhrOptions {
@@ -27,18 +25,21 @@ module OneMinuteScript {
 
     export class LiveApi implements Api {
         private settings: Settings;
-        private apibase: string;
-        private cdn1: string = DEFAULT_S3;
-        private cdn2: string;
+        private apibase: string = DEFAULT_API_BASE;
+        private soundCdn: string = DEFAULT_S3;
+        // Caching proxy for API, useful for cacheable GET resources
+        private apiCdn: string = DEFAULT_API_BASE;
         private user_exid: Promise<string>;
 
         constructor(apibase?: string) {
-            this.cdn2 = this.apibase = apibase === undefined ? DEFAULT_API_BASE : apibase;
+            if (apibase !== undefined) {
+                this.apiCdn = this.apibase = apibase;
+            }
             this.user_exid = this.performRequest<Profile>(this.apibase + "me").then(x => x.user_exid);
         }
 
         getProfile(userExid: string): Promise<Profile> {
-            return this.performRequest(this.cdn2 + userExid);
+            return this.performRequest(this.apiCdn + userExid);
         }
 
         // url: the (fq) resource
@@ -156,8 +157,8 @@ module OneMinuteScript {
             });
         }
 
-        getRecordingUrl(recordingExid: string): Promise<string> {
-            return Promise.resolve(this.cdn1 + recordingExid);
+        getSoundUrl(recordingExid: string): Promise<string> {
+            return Promise.resolve(this.soundCdn + recordingExid + SOUND_EXTENSION);
         }
 
         getTargets(): Promise<Profile[]> {

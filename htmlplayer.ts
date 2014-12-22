@@ -21,22 +21,17 @@ module OneMinuteScript {
         done: Promise<any>;
     }
 
-    var SOUNDS_BASE = "https://oneminuterecordings.s3.amazonaws.com/";
-    //var SOUNDS_BASE = "resources/";
-
-    function soundUrl(snd: BuiltinSound): string {
-        return SOUNDS_BASE + snd.recording_exid;
-    }
-
     function preloadAudioResources(api: Api, scene: Scene): Promise<void> {
         var resources = new ResourceFetchingPlayer(scene);
         var i = 0;
         var j = 0;
         var readys: Promise<void>[] = resources.sounds.map(function (snd) {
-            var audio = new Audio(soundUrl(snd));
-            return new Promise<void>(function (ok) {
-                // Preloading doesn't care about errors
-                audio.onerror = audio.onloadeddata = e => ok();
+            return api.getSoundUrl(snd.recording_exid).then(function (url) {
+                var audio = new Audio(url);
+                return new Promise<void>(function (ok) {
+                    // Preloading doesn't care about errors
+                    audio.onerror = audio.onloadeddata = e => ok();
+                });
             });
         });
         return Promise.all(readys).then(() => { console.log("All resources prefetched."); });
@@ -127,13 +122,13 @@ module OneMinuteScript {
         private audio: HTMLAudioElement;
         done: Promise<void>;
 
-        constructor(snd: BuiltinSound) {
+        constructor(url: string) {
             var audio = new Audio();
             this.done = new Promise<void>(function (ok, bad) {
                 audio.onended = e => ok();
                 audio.onerror = bad;
             });
-            audio.src = soundUrl(snd);
+            audio.src = url;
             this.audio = audio;
         }
 
@@ -210,12 +205,15 @@ module OneMinuteScript {
         }
 
         playBuiltin(snd: BuiltinSound, cls: string) {
-            var action: PlayerAction = new PlaySoundAction(snd);
-            var onok = () => this.next();
-            var onbad = e => this.writeSoundDescription(snd, cls);
-            action.done.then(onok, onbad);
-            this.runningAction = action;
-            action.play();
+            var sp = this;
+            sp.p.api.getSoundUrl(snd.recording_exid).then(function (audio_url) {
+                var action: PlayerAction = new PlaySoundAction(audio_url);
+                var onok = () => sp.next();
+                var onbad = e => sp.writeSoundDescription(snd, cls);
+                action.done.then(onok, onbad);
+                sp.runningAction = action;
+                action.play();
+            });
         }
 
         recordMessage(): Promise<string> {

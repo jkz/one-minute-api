@@ -29,11 +29,11 @@ module OneMinuteScript {
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(ExploreNeighborhood1Scene),
             content: [
-                p.voiceOver(snd("sound/vo/welcome-to-your-house-1.mp3",
+                p.voiceOver(snd("sound/vo/welcome-to-your-house-1",
                     "Welcome to your house. Before we explore your house, let's go explore the neighborhood. Follow me.")),
-                p.ambient(snd("sound/ambient/footsteps-in-hallway-1.wav", "Footsteps in hallway, 5ft")),
-                p.ambient(snd("sound/ambient/door-open-close-1-clipped.wav", "Front door opens")),
-                p.ambient(snd("sound/ambient/footsteps-gravel-1-original.wav", "footsteps on gravel (path in frontyard), 10ft")),
+                p.ambient(snd("sound/ambient/footsteps-in-hallway-1", "Footsteps in hallway, 5ft")),
+                p.ambient(snd("sound/ambient/door-open-close-1-clipped", "Front door opens")),
+                p.ambient(snd("sound/ambient/footsteps-gravel-1", "footsteps on gravel (path in frontyard), 10ft")),
             ],
         };
     };
@@ -44,9 +44,9 @@ module OneMinuteScript {
             prev: p.goToScene(NewUserScene),
             next: p.goToScene(BusstopToLafayetteScene),
             content: [
-                p.ambient(snd("sound/ambient/footsteps-on-pavement-1-clipped.wav",
+                p.ambient(snd("sound/ambient/footsteps-on-pavement-1-clipped",
                     "Footsteps on the pavement. Background noise: people talking, light street activity. 30ft.")),
-                p.voiceOver(snd("sound/vo/intro-1st-neighbor-1-clipped.mp3",
+                p.voiceOver(snd("sound/vo/intro-1st-neighbor-1-clipped",
                     "This is the first house. Let's check out who lives here.")),
                 /* Profile of owner plays. It's a sample profile that demonstrates to
                  * the user what a profile is, just like Tinder's screenshot of that

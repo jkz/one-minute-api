@@ -106,7 +106,7 @@ module OneMinuteScript {
             return Promise.reject(new Error("mock putRecording not implemented"));
         }
 
-        getRecordingUrl(recordingExid: string): Promise<string> {
+        getSoundUrl(recordingExid: string): Promise<string> {
             return Promise.resolve("https://www.example.com/" + recordingExid);
         }
 
