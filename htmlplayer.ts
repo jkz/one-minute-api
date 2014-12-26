@@ -7,6 +7,7 @@
 /// <reference path="types.ts"/>
 /// <reference path="script.ts"/>
 /// <reference path="resourcefetchingplayer.ts"/>
+/// <reference path="touch-events.d.ts"/>
 
 interface Func<T> {
     (): T;
@@ -35,6 +36,62 @@ module OneMinuteScript {
             });
         });
         return Promise.all(readys).then(() => { console.log("All resources prefetched."); });
+    }
+
+    interface SwipeCallbacks {
+        left?: Action;
+        right?: Action;
+        up?: Action;
+        down?: Action;
+    }
+
+    // Set page-wide swipe handlers. Call the return value to unregister the handlers.
+    function onSwipe(callbacks: SwipeCallbacks): Action {
+        var start: {
+            x: number;
+            y: number;
+            id: number
+        };
+        function ontouchstart(e: TouchEvent) {
+            e.preventDefault();
+            var touch = e.changedTouches[0];
+            start = {
+                id: touch.identifier,
+                x: touch.clientX,
+                y: touch.clientY
+            };
+        }
+        function ontouchend(e: TouchEvent) {
+            e.preventDefault();
+            for (var i = 0; i < e.changedTouches.length; i++) {
+                var touch = e.changedTouches[i];
+                // Ignore unrelated touches
+                if (touch.identifier === start.id) {
+                    var dx = touch.clientX - start.x;
+                    var dy = touch.clientY - start.y;
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        if (dx > 0) {
+                            callbacks.right && callbacks.right();
+                        } else {
+                            callbacks.left && callbacks.left();
+                        }
+                    } else {
+                        if (dy > 0) {
+                            callbacks.down && callbacks.down();
+                        } else {
+                            callbacks.up && callbacks.up();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        document.addEventListener("touchstart", ontouchstart);
+        document.addEventListener("touchend", ontouchend);
+        return function () {
+            document.removeEventListener("touchstart", ontouchstart);
+            document.removeEventListener("touchend", ontouchend);
+        };
     }
 
     // Write a message to this element in "teletype style", where text appears
@@ -159,6 +216,13 @@ module OneMinuteScript {
         action: Action;
     }
 
+    function addParagraph(container: HTMLElement, text: string): HTMLParagraphElement {
+        var el = document.createElement('p');
+        el.textContent = text;
+        container.appendChild(el);
+        return el;
+    }
+
     // Play one scene
     class ScenePlayer {
         private runningAction: PlayerAction;
@@ -170,10 +234,7 @@ module OneMinuteScript {
         constructor(private p: HtmlTextPlayer, public scene: Scene, private container: HTMLElement) {
             var sceneDef = scene(p);
             if (undefined !== sceneDef.name) {
-                var el = document.createElement('p');
-                el.classList.add('scene');
-                el.textContent = 'SCENE: ' + sceneDef.name;
-                this.container.appendChild(el);
+                addParagraph(this.container, 'SCENE: ' + sceneDef.name).classList.add('scene');
             }
             this.actions.push.apply(this.actions, sceneDef.content);
             // Default last action
@@ -307,6 +368,12 @@ module OneMinuteScript {
                 }
                 e.preventDefault();
             };
+            onSwipe({
+                up: () => p.sp.buttons.playPause(),
+                down: () => p.sp.buttons.playPause(),
+                left: () => p.sp.buttons.prev(),
+                right: () => p.sp.buttons.next()
+            });
             api.getTargets().then(function (targets) {
                 p.targets = targets;
             }, function (err) {
